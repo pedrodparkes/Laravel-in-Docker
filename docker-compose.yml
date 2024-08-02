@@ -1,0 +1,38 @@
+services:
+  # We need to run the FPM container for our application
+  laravel.fpm:
+    image: <aws_account_id>.dkr.ecr.eu-central-1.amazonaws.com/fpm-server:<image_tag>
+    restart: unless-stopped
+    environment:
+      APP_DEBUG: "true"
+    volumes:
+      - '.:/opt/apps/laravel-in-kubernetes'
+    networks:
+      - laravel-in-kubernetes
+
+  laravel.web:
+    image: <aws_account_id>.dkr.ecr.eu-central-1.amazonaws.com/web-server:<image_tag>
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    environment:
+      FPM_HOST: "laravel.fpm:9000"
+    volumes:
+      - './public:/opt/apps/laravel-in-kubernetes/public'
+    networks:
+      - laravel-in-kubernetes
+
+  laravel.cron:
+    image: <aws_account_id>.dkr.ecr.eu-central-1.amazonaws.com/fpm-cron:<image_tag>
+    restart: unless-stopped
+    volumes:
+      - '.:/opt/apps/laravel-in-kubernetes'
+    networks:
+      - laravel-in-kubernetes
+
+networks:
+  laravel-in-kubernetes:
+
+volumes:
+  dbdata:
+    driver: local
