@@ -16,9 +16,12 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 COPY --chown=www-data:www-data . /var/www/html
 
 RUN rm *.lock | true
+RUN mv .env.example .env
+RUN mkdir -p /var/www/html/storage/framework/sessions && mkdir -p /var/www/html/storage/framework/views && mkdir -p /var/www/html/storage/framework/cache && mkdir -p /var/www/html/storage/logs
+RUN pwd
 RUN composer install
 RUN mkdir /logs
-RUN chown www-data:www-data /logs -R
+RUN chown www-data:www-data /var/www/html/ -R
 
 WORKDIR /var/www/html
 RUN npm install
